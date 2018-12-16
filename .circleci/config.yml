@@ -41,13 +41,34 @@ jobs:
 
   deploy:
     docker:
-      - image: circleci/python:3.6.1
-
+      - image: google/cloud-sdk
+    environment:
+      - PROJECT_NAME: "startmeapp-hackathon"
+      - GOOGLE_PROJECT_ID: "startmeapp-hackathon"
+      - GOOGLE_COMPUTE_ZONE: "europe-west1-b"
+      - GOOGLE_CLUSTER_NAME: "startmeapp-hackathon-cluster"
     steps:
-      - run:
-          name: Deploy app to the cloud provider via Docker
+
+      - checkout
+    
+      - run: 
+          name: Setup Google Cloud SDK
           command: |
-            echo "Deploy to google cloud - step not implemented to avoid extra costs with google cloud - deployed manually when creating the doc"
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+
+      - run: 
+          name: Deploy to Kubernetes
+          command: |
+            envsubst < ${HOME}/kubernetes/controller/app-controller.yml > ${HOME}/patched-app-controller.yml
+            envsubst < ${HOME}/kubernetes/service/app-service.yml > ${HOME}/patched-app-service.yml
+            kubectl apply -f ${HOME}/patched-app-controller.yml
+            kubectl apply -f ${HOME}/patched-app-service.yml
+            kubectl rollout status deployment/${PROJECT_NAME}
 
   test:
     machine: true

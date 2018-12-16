@@ -62,6 +62,7 @@ jobs:
       - run: 
           name: Deploy to Kubernetes
           command: |
+            ls
             envsubst < ./kubernetes/controller/app-controller.yml > ./patched-app-controller.yml
             envsubst < ./kubernetes/service/app-service.yml > ./patched-app-service.yml
             kubectl apply -f ./patched-app-controller.yml
@@ -96,14 +97,15 @@ workflows:
 
   build-deploy:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
-      - deploy:
-          requires:
-            - test
-            - build
-          filters:
-            branches:
-              only: master
+      - deploy
+      # - build
+      # - test:
+      #     requires:
+      #       - build
+      # - deploy:
+      #     requires:
+      #       - test
+      #       - build
+      #     filters:
+      #       branches:
+      #         only: master

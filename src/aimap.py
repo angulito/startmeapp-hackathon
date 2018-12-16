@@ -3,13 +3,13 @@ import osmnx as ox, geopandas as gpd, networkx as nx
 # Legazpi 40.3911, -3.6948
 # Atocha 40.4068, -3.6884
 
-def get_surroundings_map(origin_lat, origin_long, dst_lat, dst_long):
+def get_surroundings_map(origin_lat, origin_long, dst_lat, dst_long, user_type='bike'):
 	north = max(origin_lat, dst_lat) + 0.01
 	south = min(origin_lat, dst_lat) - 0.01
 	west = min(origin_long, dst_long) - 0.01
 	east = max(origin_long, dst_long) + 0.01
 
-	return ox.graph_from_bbox(north, south, east, west, network_type='bike')
+	return ox.graph_from_bbox(north, south, east, west, network_type=user_type)
 
 """
 def get_surroundings_map(origin_lat, origin_long, dst_lat, dst_long):
@@ -24,8 +24,8 @@ def get_route(G, origin_lat, origin_long, dst_lat, dst_long):
 
 	return route
 
-def calculate_route(origin_lat, origin_long, dst_lat, dst_long):
-	G = get_surroundings_map(origin_lat, origin_long, dst_lat, dst_long)
+def calculate_route(origin_lat, origin_long, dst_lat, dst_long, user_type='bike'):
+	G = get_surroundings_map(origin_lat, origin_long, dst_lat, dst_long, user_type)
 	route = get_route(G, origin_lat, origin_long, dst_lat, dst_long)
 
 	route_nodes = []

@@ -3,6 +3,7 @@ import pandas as pd
 
 from math import sin, cos, sqrt, atan2, radians
 import math
+import aimap
 
 def distance(lat1, lon1, lat2, lon2):
     # approximate radius of earth in km
@@ -56,6 +57,11 @@ class AIBici():
         results['parking_distance'] = dist_pa_pb
         results['time_expected'] = self.bicycle_time(results)
 
+        route = aimap.calculate_route(*p_a.get('location'), *p_b.get('location'))
+
+        results['nodes'] = route['nodes']
+        results['edges'] = route['edges']
+
         return results
 
     def walking_a_to_b(self, a, b):
@@ -63,6 +69,12 @@ class AIBici():
         dist = distance(*a, *b)
         results['distance'] = dist
         results['time_expected'] = dist
+
+        route = aimap.calculate_route(*p_a.get('location'), *p_b.get('location'), user_type='walk')
+
+        results['nodes'] = route['nodes']
+        results['edges'] = route['edges']
+
         return results
 
     def from_address(self, address):
@@ -70,5 +82,7 @@ class AIBici():
         EL_PAIS_LOC = (40.43723, -3.623797)
         if address == 'matadero':
             return MATADERO_LOC
-        else:
+        elif address == 'elpais':
             return EL_PAIS_LOC
+        else:
+            return aimap.get_coordinates_from_address(address)

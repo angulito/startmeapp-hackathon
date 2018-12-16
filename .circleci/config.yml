@@ -1,0 +1,90 @@
+version: 2
+jobs:
+
+  build:
+    docker:
+      - image: circleci/python:3.6.1
+        environment:
+          FLASK_CONFIG: testing
+
+    working_directory: ~/startmeapp-hackathon
+
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: Set docker image tag
+          command: |
+            SHORT_COMMIT_HASH="$(git rev-parse --short=8 HEAD)"
+            if [ $CIRCLE_BRANCH == 'master' ]; then
+                BRANCH_TAG_PREFIX='master'
+            else
+                BRANCH_TAG_PREFIX='branch'
+            fi
+            echo "export IMAGE_NAME=startmeapp-hackathon" >> $BASH_ENV
+            echo "export IMAGE_TAG=${BRANCH_TAG_PREFIX}-${SHORT_COMMIT_HASH}" >> $BASH_ENV
+
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t angulito/$IMAGE_NAME:$IMAGE_TAG -t angulito/$IMAGE_NAME:latest .
+
+      - run:
+          name: Push docker image
+          command: |
+            docker login -u $DOCKER_LOGIN -p $DOCKER_PWD
+            docker push angulito/$IMAGE_NAME:$IMAGE_TAG
+            docker push angulito/$IMAGE_NAME:latest
+
+  deploy:
+    docker:
+      - image: circleci/python:3.6.1
+
+    steps:
+      - run:
+          name: Deploy app to the cloud provider via Docker
+          command: |
+            echo "Deploy to google cloud - step not implemented to avoid extra costs with google cloud - deployed manually when creating the doc"
+
+  test:
+    machine: true
+
+    steps:
+      - checkout
+
+      - run:
+          name: Set docker image tag
+          command: |
+            SHORT_COMMIT_HASH="$(git rev-parse --short=8 HEAD)"
+            if [ $CIRCLE_BRANCH == 'master' ]; then
+                BRANCH_TAG_PREFIX='master'
+            else
+                BRANCH_TAG_PREFIX='branch'
+            fi
+            echo "export IMAGE_NAME=startmeapp-hackathon" >> $BASH_ENV
+            echo "export IMAGE_TAG=${BRANCH_TAG_PREFIX}-${SHORT_COMMIT_HASH}" >> $BASH_ENV
+
+      - run:
+          name: Running tests
+          command: docker run -v $(pwd):/usr/app angulito/$IMAGE_NAME:$IMAGE_TAG bash -c "python -m pytest"
+
+
+workflows:
+  version: 2
+
+  build-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
+            - build
+          filters:
+            branches:
+              only: master

@@ -30,13 +30,14 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            docker build -t angulito/$IMAGE_NAME:$IMAGE_TAG .
+            docker build -t angulito/$IMAGE_NAME:$IMAGE_TAG -t angulito/$IMAGE_NAME:latest .
 
       - run:
           name: Push docker image
           command: |
             docker login -u $DOCKER_LOGIN -p $DOCKER_PWD
             docker push angulito/$IMAGE_NAME:$IMAGE_TAG
+            docker push angulito/$IMAGE_NAME:latest
 
   deploy:
     docker:

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: startmeapp-hackathon-app
+  name: startmeapp-hackathon-app-controller
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: startmeapp-hackathon-app
+  template:
+    metadata:
+      labels:
+        name: startmeapp-hackathon-app
+    spec:
+      containers:
+        - image: registry.hub.docker.com/angulito/startmeapp-hackathon:latest
+          name: startmeapp-hackathon-app
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 5000
+            name: http-server

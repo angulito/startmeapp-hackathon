@@ -6,8 +6,6 @@ RUN apt-get update && apt-get install -y \
     htop \
  && rm -rf /var/lib/apt/lists/*
 
-RUN (wget -O - pi.dk/3 || curl pi.dk/3/ || fetch -o - http://pi.dk/3) | bash
-
 WORKDIR /usr/app
 
 COPY . .

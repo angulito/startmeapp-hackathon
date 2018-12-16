@@ -62,9 +62,6 @@ jobs:
       - run: 
           name: Deploy to Kubernetes
           command: |
-            ls
-            # envsubst < ./kubernetes/controller/app-controller.yaml > ./patched-app-controller.yml
-            # envsubst < ./kubernetes/service/app-service.yaml > ./patched-app-service.yml
             kubectl apply -f ./kubernetes/controller/app-controller.yaml
             kubectl apply -f ./kubernetes/service/app-service.yaml
             kubectl rollout status deployment.v1.apps/startmeapp-hackathon-app-controller
@@ -96,16 +93,14 @@ workflows:
   version: 2
 
   build-deploy:
-    jobs:
-      - deploy
-      # - build
-      # - test:
-      #     requires:
-      #       - build
-      # - deploy:
-      #     requires:
-      #       - test
-      #       - build
-      #     filters:
-      #       branches:
-      #         only: master
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
+            - build
+          filters:
+            branches:
+              only: master

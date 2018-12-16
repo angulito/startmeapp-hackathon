@@ -67,7 +67,7 @@ jobs:
             # envsubst < ./kubernetes/service/app-service.yaml > ./patched-app-service.yml
             kubectl apply -f ./kubernetes/controller/app-controller.yaml
             kubectl apply -f ./kubernetes/service/app-service.yaml
-            kubectl rollout status deployment/${PROJECT_NAME}
+            kubectl rollout status deployment.v1.apps/startmeapp-hackathon-app-controller
 
   test:
     machine: true

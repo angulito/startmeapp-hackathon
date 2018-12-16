@@ -49,6 +49,8 @@ jobs:
             echo "Deploy to google cloud - step not implemented to avoid extra costs with google cloud - deployed manually when creating the doc"
 
   test:
+    machine: true
+    
     steps:
       - checkout
 

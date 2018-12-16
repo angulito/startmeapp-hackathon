@@ -50,13 +50,25 @@ jobs:
 
   test:
     machine: true
-    
+
     steps:
       - checkout
 
       - run:
+          name: Set docker image tag
+          command: |
+            SHORT_COMMIT_HASH="$(git rev-parse --short=8 HEAD)"
+            if [ $CIRCLE_BRANCH == 'master' ]; then
+                BRANCH_TAG_PREFIX='master'
+            else
+                BRANCH_TAG_PREFIX='branch'
+            fi
+            echo "export IMAGE_NAME=startmeapp-hackathon" >> $BASH_ENV
+            echo "export IMAGE_TAG=${BRANCH_TAG_PREFIX}-${SHORT_COMMIT_HASH}" >> $BASH_ENV
+
+      - run:
           name: Running tests
-          command: docker run -v $(pwd):/usr/app angulito/startmeapp-hackathon:latest bash -c "python -m pytest"
+          command: docker run -v $(pwd):/usr/app angulito/$IMAGE_NAME:$IMAGE_TAG bash -c "python -m pytest"
 
 
 workflows:

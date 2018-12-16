@@ -63,10 +63,10 @@ jobs:
           name: Deploy to Kubernetes
           command: |
             ls
-            envsubst < ./kubernetes/controller/app-controller.yaml > ./patched-app-controller.yml
-            envsubst < ./kubernetes/service/app-service.yaml > ./patched-app-service.yml
-            kubectl apply -f ./patched-app-controller.yml
-            kubectl apply -f ./patched-app-service.yml
+            # envsubst < ./kubernetes/controller/app-controller.yaml > ./patched-app-controller.yml
+            # envsubst < ./kubernetes/service/app-service.yaml > ./patched-app-service.yml
+            kubectl apply -f ./kubernetes/controller/app-controller.yaml
+            kubectl apply -f ./kubernetes/service/app-service.yaml
             kubectl rollout status deployment/${PROJECT_NAME}
 
   test:

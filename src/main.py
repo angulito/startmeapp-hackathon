@@ -9,8 +9,9 @@ APP = Flask(__name__)
 
 @APP.route('/a2b', methods=['POST'])
 def a_to_b():
-    origin = request.form['origin']
-    destination = request.form['destination']
+    content = request.json
+    origin = content['origin']
+    destination = content['destination']
 
     aib = AIBici()
     loc_origin = aib.from_address(origin)
